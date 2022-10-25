@@ -1,0 +1,38 @@
+version: '3.2'
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins
+    ports:
+      - "8080:8080"
+    environment:
+        TZ: Asia/Taipei
+    volumes:
+      - $PWD/jenkins_home:/var/jenkins_home
+      - $PWD/jenkins_script:/tmp/jenkins_script
+      - $PWD/jenkins-data/ssh-key:/ssh-key
+    networks:
+      - net
+  sshserver:
+    container_name: sshserver
+    image: sshserver
+    environment:
+        TZ: Asia/Taipei
+    build:
+      context: . #當前目錄下
+    volumes:
+      - $PWD/jenkins_script/backup.sh:/tmp/backup.sh
+    networks:
+      - net
+  mysql-server:
+    container_name: mysql-server
+    image: mysql:5.7
+    environment:
+      - TZ=Asia/Taipei
+      - "MYSQL_ROOT_PASSWORD=1234"
+    volumes:
+      - $PWD/db-data:/var/lib/mysql
+    networks:
+      - net
+networks:
+  net:
